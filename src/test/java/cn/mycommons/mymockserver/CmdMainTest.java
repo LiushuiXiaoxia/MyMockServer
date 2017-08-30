@@ -1,7 +1,10 @@
 package cn.mycommons.mymockserver;
 
+import cn.mycommons.mymockserver.util.SampleUtil;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.io.File;
 
 /**
  * CmdMainTest <br/>
@@ -37,6 +40,7 @@ public class CmdMainTest {
         // init
         String cmd = "mms -i";
         new CmdMain().execute(cmd.split(" "));
+        new File(SampleUtil.TEMPLATE_FILE_NAME).deleteOnExit();
 
         String cmd2 = "mms -i -c mock";
         new CmdMain().execute(cmd2.split(" "));

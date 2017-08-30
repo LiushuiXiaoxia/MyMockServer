@@ -1,5 +1,6 @@
+def VERSION = '0.1'
 group 'cn.mycommons'
-version '1.0-SNAPSHOT'
+version VERSION + '-SNAPSHOT'
 
 apply plugin: 'groovy'
 apply plugin: 'java'
@@ -33,7 +34,7 @@ dependencies {
 }
 
 jar {
-    archiveName = "mms_${version}.jar"
+    archiveName = "mms-${VERSION}.jar"
     from {
         configurations.extraLibs.collect { it.isDirectory() ? it : zipTree(it) }
         configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) }
@@ -51,5 +52,14 @@ test {
     }
     onOutput { descriptor, event ->
         logger.lifecycle "output:\n${event.message}"
+    }
+}
+
+task mmsDeploy(group: 'deploy', dependsOn: build, type: Exec) {
+    workingDir 'build/libs'
+    commandLine "tar -cvf ../../deploy/${jar.archiveName}.tar mms-${VERSION}.jar".split(" ")
+    standardOutput = new ByteArrayOutputStream()
+    ext.output = {
+        return standardOutput.toString()
     }
 }
