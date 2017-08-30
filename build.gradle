@@ -1,0 +1,55 @@
+group 'cn.mycommons'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'groovy'
+apply plugin: 'java'
+apply plugin: 'application'
+
+
+sourceCompatibility = 1.8
+
+mainClassName = "cn.mycommons.mymockserver.MmsMain"
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    // configuration that holds jars to include in the jar
+    extraLibs
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.4.12'
+    compile 'com.google.code.gson:gson:2.8.1'
+    compile 'org.mock-server:mockserver:3.10.8'
+    compile 'log4j:log4j:1.2.17'
+    compile 'org.slf4j:slf4j-api:1.7.24'
+    compile 'org.slf4j:slf4j-log4j12:1.6.0'
+    compile 'org.littleshoot:littleproxy:1.1.2'
+    compile 'commons-cli:commons-cli:1.2'
+
+    testCompile 'org.testng:testng:6.8.21'
+}
+
+jar {
+    archiveName = "mms_${version}.jar"
+    from {
+        configurations.extraLibs.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+}
+
+test {
+    useTestNG()
+    beforeTest { descriptor ->
+        logger.lifecycle "${descriptor}"
+    }
+    onOutput { descriptor, event ->
+        logger.lifecycle "output:\n${event.message}"
+    }
+}
