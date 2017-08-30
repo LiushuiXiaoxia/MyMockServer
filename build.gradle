@@ -1,6 +1,5 @@
-def VERSION = '0.1'
 group 'cn.mycommons'
-version VERSION + '-SNAPSHOT'
+version '0.1'
 
 apply plugin: 'groovy'
 apply plugin: 'java'
@@ -33,18 +32,6 @@ dependencies {
     testCompile 'org.testng:testng:6.8.21'
 }
 
-jar {
-    archiveName = "mms-${VERSION}.jar"
-    from {
-        configurations.extraLibs.collect { it.isDirectory() ? it : zipTree(it) }
-        configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) }
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-    manifest {
-        attributes 'Main-Class': mainClassName
-    }
-}
-
 test {
     useTestNG()
     beforeTest { descriptor ->
@@ -55,9 +42,16 @@ test {
     }
 }
 
+distributions {
+    main {
+        baseName = 'mms'
+    }
+}
+
 task mmsDeploy(group: 'deploy', dependsOn: build, type: Exec) {
-    workingDir 'build/libs'
-    commandLine "tar -cvf ../../deploy/${jar.archiveName}.tar mms-${VERSION}.jar".split(" ")
+    workingDir 'build/distributions'
+    // commandLine "tar -cvf ../../deploy/${jar.archiveName}.tar *.tar".split(" ")
+    commandLine "cp mms-${version}.tar ../../deploy".split(" ")
     standardOutput = new ByteArrayOutputStream()
     ext.output = {
         return standardOutput.toString()
