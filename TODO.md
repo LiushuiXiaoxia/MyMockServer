@@ -1,9 +1,3 @@
-# MyMockServer
-
----
-
-# Info
-
 # Todo
 
 ~~* log~~
@@ -16,7 +10,7 @@
 
 * ssl
 
-* cmd param config
+~~* cmd param config~~
 
 ```bash
 
@@ -33,9 +27,9 @@ mms -p 8001 -c mock
 mms -port 8001 --config mock
 ```
 
-* brew
+~~* brew~~
 
-* cmd log
+~~* cmd log~~
 
 * test unit
 

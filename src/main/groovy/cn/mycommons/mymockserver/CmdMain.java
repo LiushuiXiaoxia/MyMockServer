@@ -1,13 +1,22 @@
 package cn.mycommons.mymockserver;
 
 import cn.mycommons.mymockserver.util.SampleUtil;
+import com.google.common.base.Joiner;
 import org.apache.commons.cli.*;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * CmdMain <br/>
  * Created by Leon on 2017-08-30.
  */
 public class CmdMain {
+
+    private static final Logger LOGGER = Logger.getLogger(CmdMain.class);
 
     private static final String OPTION_H = "h";
     private static final String OPTION_HELP = "help";
@@ -21,9 +30,15 @@ public class CmdMain {
     private static final String OPTION_P = "p";
     private static final String OPTION_PORT = "port";
 
+    private static final String OPTION_L = "l";
+    private static final String OPTION_LEVEL = "level";
+
     public static final int DEFAULT_PORT = 8001;
     public static final String DEFAULT_STRING_PORT = DEFAULT_PORT + "";
     public static final String DEFAULT_PATH = "./";
+    public static final String DEFAULT_LOG_LEVEL = "INFO";
+
+    public static final List<String> LOGS = Arrays.asList("ALL", "DEBUG", "INFO", "WARN", "ERROR", "FATAL", "OFF", "TRACE");
 
 
     public void execute(String[] args) {
@@ -34,12 +49,17 @@ public class CmdMain {
         options.addOption(OPTION_P, OPTION_PORT, true, "mock server port, default is 8001");
         options.addOption(OPTION_C, OPTION_CONFIG, true, "mock server path, default is current directory");
         options.addOption(OPTION_H, OPTION_HELP, false, "output usage information");
+        options.addOption(OPTION_L, OPTION_LEVEL, true, "log level " + Joiner.on(",").join(LOGS));
 
         CommandLineParser parser = new PosixParser();
         CommandLine cmd;
 
         try {
             cmd = parser.parse(options, args);
+
+            // log
+            configLog(cmd);
+
             if (cmd.hasOption(OPTION_H)) {
                 runHelp(options);
             } else if (cmd.hasOption(OPTION_I)) {
@@ -82,6 +102,17 @@ public class CmdMain {
         } catch (ParseException e) {
             showHelp(e.getMessage(), options);
         }
+    }
+
+    private void configLog(CommandLine cmd) {
+        String logLevel = DEFAULT_LOG_LEVEL;
+        if (cmd.hasOption(OPTION_L)) {
+            logLevel = cmd.getOptionValue(OPTION_L);
+        }
+        Level level = Level.toLevel(logLevel, Level.INFO);
+        LogManager.getRootLogger().setLevel(level);
+
+        LOGGER.error("log logLevel = " + level);
     }
 
     private void showHelp(String errorMsg, Options options) {
