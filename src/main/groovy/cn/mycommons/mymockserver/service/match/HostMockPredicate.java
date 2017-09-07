@@ -1,7 +1,7 @@
 package cn.mycommons.mymockserver.service.match;
 
 import cn.mycommons.mymockserver.bean.Mock;
-import cn.mycommons.mymockserver.service.ProxyHttpFilters;
+import org.apache.log4j.Logger;
 
 import java.net.URI;
 import java.util.Objects;
@@ -12,6 +12,8 @@ import java.util.function.Predicate;
  * Created by Leon on 2017-08-29.
  */
 public class HostMockPredicate implements Predicate<Mock> {
+
+    private static final Logger LOGGER = Logger.getLogger(HostMockPredicate.class);
 
     private final URI uri;
 
@@ -24,8 +26,8 @@ public class HostMockPredicate implements Predicate<Mock> {
         String host = mock.getRequest().getHost();
         String host2 = uri.getHost();
 
-        ProxyHttpFilters.LOGGER.debug("host = " + host);
-        ProxyHttpFilters.LOGGER.debug("host2 = " + host2);
+        LOGGER.debug("host = " + host);
+        LOGGER.debug("host2 = " + host2);
 
         return host == null || Objects.equals(host, host2);
     }
