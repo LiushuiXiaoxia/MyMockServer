@@ -1,5 +1,6 @@
 package cn.mycommons.mymockserver;
 
+import cn.mycommons.mymockserver.util.HttpsCheck;
 import cn.mycommons.mymockserver.util.MsgUtil;
 import cn.mycommons.mymockserver.util.SampleUtil;
 import com.google.common.base.Joiner;
@@ -34,7 +35,7 @@ public class CmdMain {
     private static final String OPTION_L = "l";
     private static final String OPTION_LEVEL = "level";
 
-//    public static final int DEFAULT_PORT = 8001;
+    //    public static final int DEFAULT_PORT = 8001;
     public static final int DEFAULT_PORT = 9090;
     public static final String DEFAULT_STRING_PORT = DEFAULT_PORT + "";
     public static final String DEFAULT_PATH = "./";
@@ -127,8 +128,10 @@ public class CmdMain {
     private void runStartServer(int port, String configPath) {
         MsgUtil.msg();
 
+        String authorityPath = HttpsCheck.initHttpsFiles();
+
         MyMockServer server = new MyMockServer();
-        server.start(configPath, port);
+        server.start(configPath, port, authorityPath);
     }
 
     private void runHelp(Options options) {

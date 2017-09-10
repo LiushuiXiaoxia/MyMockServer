@@ -9,8 +9,10 @@ import com.google.common.base.Joiner;
 import org.apache.log4j.Logger;
 import org.littleshoot.proxy.HttpProxyServer;
 import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
+import org.littleshoot.proxy.mitm.Authority;
 import org.littleshoot.proxy.mitm.CertificateSniffingMitmManager;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +30,7 @@ public class MyMockServer {
     private MockServerScan mockServerScan;
     private HttpProxyServer httpProxyServer;
 
-    public void start(String path, int port) {
+    void start(String path, int port, String authorityPath) {
         watchPath = new WatchFileService(path);
         mockServerScan = new MockServerScan(path, 1);
 
@@ -70,37 +72,22 @@ public class MyMockServer {
         watchPath.startWatch();
 
         try {
-//            File file = new File("./keystore.p12");
-//            ImpersonatingMitmManager manager;
-//            if (file.exists()) {
-//                CertificateAndKeySource existingCertificateSource =
-//                        new KeyStoreFileCertificateSource("PKCS12", file, "privateKeyAlias", "password");
-//
-//                // configure the MitmManager to use the custom KeyStore source
-//                manager = ImpersonatingMitmManager.builder()
-//                        .rootCertificateSource(existingCertificateSource)
-//                        .build();
-//            } else {
-//                // create a CA Root Certificate using default settings
-//                RootCertificateGenerator rootCertificateGenerator = RootCertificateGenerator.builder().build();
-//
-//                // save the newly-generated Root Certificate and Private Key -- the .cer file can be imported
-//                // directly into a browser
-//                rootCertificateGenerator.saveRootCertificateAsPemFile(new File("./certificate.cer"));
-//                rootCertificateGenerator.savePrivateKeyAsPemFile(new File("./private-key.pem"), "password");
-//
-//                // or save the certificate and private key as a PKCS12 keystore, for later use
-//                rootCertificateGenerator.saveRootCertificateAndKey("PKCS12", file, "privateKeyAlias", "password");
-//
-//                // tell the ImpersonatingMitmManager  use the RootCertificateGenerator we just configured
-//                manager = ImpersonatingMitmManager.builder().rootCertificateSource(rootCertificateGenerator)
-//                        .rootCertificateSource(rootCertificateGenerator)
-//                        .build();
-//            }
+            String organization = "LittleProxy-mitm";
+            Authority authority = new Authority(
+                    new File(authorityPath),
+                    "littleproxy-mitm",
+                    "Be Your Own Lantern".toCharArray(),
+                    organization,
+                    organization + ", describe proxy here",
+                    "Certificate Authority",
+                    organization,
+                    organization + ", describe proxy purpose here, since Man-In-The-Middle is bad normally."
+            );
 
             httpProxyServer = DefaultHttpProxyServer.bootstrap()
                     .withPort(port)
-                    .withManInTheMiddle(new CertificateSniffingMitmManager())
+                    .withManInTheMiddle(new CertificateSniffingMitmManager(authority))
+                    // .withManInTheMiddle(new CertificateSniffingMitmManager())
                     .withFiltersSource(new ProxyHttpFiltersSourceAdapter(this))
                     .start();
         } catch (Exception e) {
