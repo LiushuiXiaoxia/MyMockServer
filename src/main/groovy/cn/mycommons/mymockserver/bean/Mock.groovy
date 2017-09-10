@@ -7,6 +7,8 @@ import com.google.gson.GsonBuilder
 
 class Mock implements IBean {
 
+    boolean enable = true
+
     String mockFile
 
     String desc

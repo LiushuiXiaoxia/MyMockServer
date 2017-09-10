@@ -74,14 +74,16 @@ def mock(Closure closure) {
 
 ${it.text}"""
                     shell.evaluate(script)
-                    List<Mock> object = binding.getProperty(propertyName)
-                    object.forEach(new Consumer<Mock>() {
-                        @Override
-                        void accept(Mock mock) {
-                            mock.mockFile = it.getAbsolutePath()
-                        }
-                    })
-                    list.addAll(object)
+                    def value = binding.getProperty(propertyName)
+                    if (value instanceof List) {
+                        value.forEach(new Consumer<Mock>() {
+                            @Override
+                            void accept(Mock mock) {
+                                mock.mockFile = it.getAbsolutePath()
+                            }
+                        })
+                        list.addAll(value)
+                    }
                 } catch (MissingMethodException e) {
                     throw new MockParaeException("${e.getMethod()} can not execute")
                 } catch (Exception e2) {

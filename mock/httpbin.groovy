@@ -1,8 +1,8 @@
 mock {
     desc "mock login"
     request {
-//        host "httpbin.org"
-//        path "/user-agent"
+        host "httpbin.org"
+        path "/user-agent"
         method "*"
     }
     response {

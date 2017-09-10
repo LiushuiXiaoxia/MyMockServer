@@ -1,16 +1,14 @@
 package cn.mycommons.mymockserver.util
 
 import cn.mycommons.mymockserver.exception.MockParaeException
-import cn.mycommons.mymockserver.service.ProxyHttpFilters
 import org.apache.log4j.Logger
-
 /**
  * DslUtil <br/>
  * Created by Leon on 2017-08-27.
  */
 class DslUtil {
 
-    private static final Logger LOGGER = Logger.getLogger(ProxyHttpFilters.class)
+    private static final Logger LOGGER = Logger.getLogger(DslUtil.class)
 
     static def globalMethodMissing(Object obj, String name, def args) {
         def property = obj.hasProperty(name)

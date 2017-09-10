@@ -14,7 +14,7 @@ import static java.nio.file.StandardWatchEventKinds.*;
  */
 public class WatchFileService {
 
-    private static final Logger LOGGER = Logger.getLogger(ProxyHttpFilters.class);
+    private static final Logger LOGGER = Logger.getLogger(WatchFileService.class);
 
     private WatchService service;
     private final String watchPath;

@@ -27,6 +27,6 @@ public class MethodMockPredicate implements Predicate<Mock> {
 
         LOGGER.debug("method = " + method);
         LOGGER.debug("method2 = " + method2);
-        return method != null && (method.equalsIgnoreCase("*") || method.equalsIgnoreCase(method2));
+        return method == null || method.equalsIgnoreCase(method2);
     }
 }

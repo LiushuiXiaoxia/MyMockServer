@@ -53,6 +53,8 @@ public class ProxyHttpFilters extends HttpFiltersAdapter {
         // scheme,port,host,path,query,header,body
         Optional<Mock> first = myMockServer.getConfigMock()
                 .stream()
+                // enable
+                .filter(new EnableMockPredicate())
                 // scheme
                 .filter(new SchemeMockPredicate(uri))
                 // port
