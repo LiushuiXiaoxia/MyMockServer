@@ -1,4 +1,5 @@
 mock {
+//    enable true
     desc "template"
     request {
 //        scheme "http"

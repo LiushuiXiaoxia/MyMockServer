@@ -46,7 +46,7 @@ public class CmdMain {
 
         Options options = new Options();
         options.addOption(OPTION_I, OPTION_INIT, false, "init some path as mock workspace");
-        options.addOption(OPTION_P, OPTION_PORT, true, "mock server port, default is 8001");
+        options.addOption(OPTION_P, OPTION_PORT, true, "mock server port, default is " + Const.DEFAULT_PORT);
         options.addOption(OPTION_C, OPTION_CONFIG, true, "mock server path, default is current directory");
         options.addOption(OPTION_H, OPTION_HELP, false, "output usage information");
         options.addOption(OPTION_L, OPTION_LEVEL, true, "log level " + Joiner.on(",").join(LOGS));
