@@ -71,8 +71,10 @@ distZip.doLast {
     print ext.sha
 }
 
-assemble.doLast {
-    project.exec {
-        commandLine "cp ${distZip.archivePath} deploy".split(" ")
+task mmsDeploy(group: 'deploy', dependsOn: assemble) {
+    doLast {
+        project.exec {
+            commandLine "cp ${distZip.archivePath} deploy".split(" ")
+        }
     }
 }
