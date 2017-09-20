@@ -1,13 +1,15 @@
 package cn.mycommons.mymockserver;
 
+import cn.mycommons.mymockserver.app.Const;
 import cn.mycommons.mymockserver.bean.Mock;
 import cn.mycommons.mymockserver.bean.http.Request;
 import cn.mycommons.mymockserver.service.MockServerScan;
-import cn.mycommons.mymockserver.service.ProxyHttpFiltersSourceAdapter;
+import cn.mycommons.mymockserver.service.ProxyAdapter;
 import cn.mycommons.mymockserver.service.WatchFileService;
 import com.google.common.base.Joiner;
 import org.apache.log4j.Logger;
 import org.littleshoot.proxy.HttpProxyServer;
+import org.littleshoot.proxy.HttpProxyServerBootstrap;
 import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
 import org.littleshoot.proxy.mitm.Authority;
 import org.littleshoot.proxy.mitm.CertificateSniffingMitmManager;
@@ -84,12 +86,16 @@ public class MyMockServer {
                     organization + ", describe proxy purpose here, since Man-In-The-Middle is bad normally."
             );
 
-            httpProxyServer = DefaultHttpProxyServer.bootstrap()
+            HttpProxyServerBootstrap bootstrap = DefaultHttpProxyServer.bootstrap()
                     .withPort(port)
-                    .withManInTheMiddle(new CertificateSniffingMitmManager(authority))
-                    // .withManInTheMiddle(new CertificateSniffingMitmManager())
-                    .withFiltersSource(new ProxyHttpFiltersSourceAdapter(this))
-                    .start();
+                    .withAllowLocalOnly(false)
+                    .withFiltersSource(new ProxyAdapter(this));
+
+            if (Const.HTTPS) {
+                bootstrap.withManInTheMiddle(new CertificateSniffingMitmManager(authority));
+            }
+
+            httpProxyServer = bootstrap.start();
         } catch (Exception e) {
             e.printStackTrace();
         }

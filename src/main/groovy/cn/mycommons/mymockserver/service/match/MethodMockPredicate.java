@@ -23,7 +23,7 @@ public class MethodMockPredicate implements Predicate<Mock> {
     @Override
     public boolean test(Mock mock) {
         String method = mock.getRequest().getMethod();
-        String method2 = originalRequest.getMethod().name();
+        String method2 = originalRequest.method().name();
 
         LOGGER.debug("method = " + method);
         LOGGER.debug("method2 = " + method2);

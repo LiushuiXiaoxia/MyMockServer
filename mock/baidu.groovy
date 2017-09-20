@@ -1,8 +1,7 @@
 mock {
-    desc "mock login"
+    desc "baidu"
     request {
-        host "httpbin.org"
-        path "/user-agent"
+        host "baidu.com"
     }
     response {
         code 200
@@ -12,19 +11,7 @@ mock {
             header "time", new Date().format("yyyy-MM-dd HH:mm:ss")
         }
         body {
-//            text "text"
-//            textFile "file.txt"
-//
             json """{"key":"value"}"""
-            jsonFile "file.txt"
-
-            xml "<xml/>"
-            xmlFile "file.txt"
-
-            html "<html/>"
-            htmlFile "file.txt"
-
-            file "file.txt"
         }
     }
     control {

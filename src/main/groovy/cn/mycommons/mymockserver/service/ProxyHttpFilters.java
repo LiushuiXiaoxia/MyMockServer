@@ -31,8 +31,8 @@ public class ProxyHttpFilters extends HttpFiltersAdapter {
 
     @Override
     public HttpResponse clientToProxyRequest(HttpObject httpObject) {
-        String uri = originalRequest.getUri();
-        HttpMethod method = originalRequest.getMethod();
+        String uri = originalRequest.uri();
+        HttpMethod method = originalRequest.method();
         LOGGER.info(String.format("proxy -> %s:%s begin", method, uri));
 
         try {
@@ -49,7 +49,7 @@ public class ProxyHttpFilters extends HttpFiltersAdapter {
     }
 
     private HttpResponse doCheck(String method) {
-        URI uri = URI.create(originalRequest.getUri());
+        URI uri = URI.create(originalRequest.uri());
         // scheme,port,host,path,query,header,body
         Optional<Mock> first = myMockServer.getConfigMock()
                 .stream()
@@ -69,9 +69,9 @@ public class ProxyHttpFilters extends HttpFiltersAdapter {
 
         if (first != null && first.isPresent()) {
             Mock mock = first.get();
-            LOGGER.info(String.format("proxy -> %s:%s mock = %s", method, uri, mock));
+            LOGGER.debug(String.format("proxy -> %s:%s mock = %s", method, uri, mock));
             if (mock.getResponse() != null) {
-                return HttpResponseUtil.gen(mock);
+                return MockResponseUtil.gen(mock);
             }
         }
         return null;

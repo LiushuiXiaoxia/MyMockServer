@@ -1,5 +1,6 @@
 package cn.mycommons.mymockserver;
 
+import cn.mycommons.mymockserver.app.Const;
 import cn.mycommons.mymockserver.util.HttpsCheck;
 import cn.mycommons.mymockserver.util.MsgUtil;
 import cn.mycommons.mymockserver.util.SampleUtil;
@@ -35,13 +36,9 @@ public class CmdMain {
     private static final String OPTION_L = "l";
     private static final String OPTION_LEVEL = "level";
 
-    //    public static final int DEFAULT_PORT = 8001;
-    public static final int DEFAULT_PORT = 9090;
-    public static final String DEFAULT_STRING_PORT = DEFAULT_PORT + "";
-    public static final String DEFAULT_PATH = "./";
-    public static final String DEFAULT_LOG_LEVEL = "INFO";
-
-    public static final List<String> LOGS = Arrays.asList("ALL", "DEBUG", "INFO", "WARN", "ERROR", "FATAL", "OFF", "TRACE");
+    private static final List<String> LOGS = Arrays.asList(
+            "ALL", "DEBUG", "INFO", "WARN", "ERROR", "FATAL", "OFF", "TRACE"
+    );
 
 
     public void execute(String[] args) {
@@ -66,7 +63,7 @@ public class CmdMain {
             if (cmd.hasOption(OPTION_H)) {
                 runHelp(options);
             } else if (cmd.hasOption(OPTION_I)) {
-                String path = DEFAULT_PATH;
+                String path = Const.DEFAULT_PATH;
                 if (cmd.hasOption(OPTION_C)) {
                     path = cmd.getOptionValue(OPTION_C);
                 }
@@ -74,7 +71,7 @@ public class CmdMain {
             } else if (cmd.hasOption(OPTION_C)) {
                 String path = cmd.getOptionValue(OPTION_C);
 
-                String port = DEFAULT_STRING_PORT;
+                String port = Const.DEFAULT_STRING_PORT;
                 if (cmd.hasOption(OPTION_P)) {
                     port = cmd.getOptionValue(OPTION_P);
                 }
@@ -90,7 +87,7 @@ public class CmdMain {
                 int intPort;
                 try {
                     intPort = Integer.parseInt(port);
-                    String path = DEFAULT_PATH;
+                    String path = Const.DEFAULT_PATH;
                     if (cmd.hasOption(OPTION_C)) {
                         path = cmd.getOptionValue(OPTION_C);
                     }
@@ -100,7 +97,7 @@ public class CmdMain {
                     showHelp("port = " + port + " error", options);
                 }
             } else {
-                runStartServer(DEFAULT_PORT, DEFAULT_PATH);
+                runStartServer(Const.DEFAULT_PORT, Const.DEFAULT_PATH);
             }
         } catch (ParseException e) {
             showHelp(e.getMessage(), options);
@@ -108,14 +105,14 @@ public class CmdMain {
     }
 
     private void configLog(CommandLine cmd) {
-        String logLevel = DEFAULT_LOG_LEVEL;
+        String logLevel = Const.DEFAULT_LOG_LEVEL;
         if (cmd.hasOption(OPTION_L)) {
             logLevel = cmd.getOptionValue(OPTION_L);
         }
         Level level = Level.toLevel(logLevel, Level.INFO);
         LogManager.getRootLogger().setLevel(level);
 
-        LOGGER.error("log logLevel = " + level);
+        System.out.println("Log level : " + level);
     }
 
     private void showHelp(String errorMsg, Options options) {

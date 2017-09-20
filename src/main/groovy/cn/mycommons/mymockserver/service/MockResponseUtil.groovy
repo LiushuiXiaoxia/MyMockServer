@@ -12,16 +12,16 @@ import java.util.function.Consumer
  * HttpResponseUtil <br/>
  * Created by Leon on 2017-08-29.
  */
-class HttpResponseUtil {
+class MockResponseUtil {
 
-    private static final Logger LOGGER = Logger.getLogger(HttpResponseUtil.class)
+    private static final Logger LOGGER = Logger.getLogger(MockResponseUtil.class)
 
     static HttpResponse gen(Mock mock) {
         long begin = System.currentTimeMillis()
 
         def version = HttpVersion.HTTP_1_1
         def ok = HttpResponseStatus.OK
-        ByteBuf buffer = null
+        ByteBuf buffer = Unpooled.buffer()
 
         def mockResp = mock.response
         if (mockResp.version) {
@@ -77,33 +77,36 @@ class HttpResponseUtil {
                     buffer = Unpooled.wrappedBuffer(mockResp.body.bytesFile.text.bytes)
                     break
                 }
-                buffer = Unpooled.buffer()
             }
+            break
         }
 
         DefaultFullHttpResponse response = new DefaultFullHttpResponse(version, ok, buffer)
-        HttpHeaders.setContentLength(response, buffer.readableBytes())
+        HttpUtil.setContentLength(response, buffer.readableBytes())
         if (mockResp.headers) {
             mockResp.headers.header.entrySet().forEach(new Consumer<Map.Entry<String, Object>>() {
                 @Override
                 void accept(Map.Entry<String, Object> entry) {
-                    HttpHeaders.addHeader(response, entry.getKey(), entry.getValue())
+                    response.headers().add(entry.getKey(), entry.getValue())
                 }
             })
         }
         // "Content-type":"text/html;charset=UTF-8"
-        HttpHeaders.addHeader(response, "Content-type", "text/plain;charset=UTF-8")
+        response.headers().add("Content-type", "text/plain;charset=UTF-8")
 
         long end = System.currentTimeMillis()
 
         if (mock.control && mock.control.delay > 0) {
             long time = mock.control.delay * 1000 - (end - begin)
-            LOGGER.info("delay time = " + time)
+            LOGGER.debug("delay time = " + time)
 
             if (time > 0) {
                 sleep(time)
             }
         }
+
+        // LOGGER.info(response)
+
         return response
     }
 }

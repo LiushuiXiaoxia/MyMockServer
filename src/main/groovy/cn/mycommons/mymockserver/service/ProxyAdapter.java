@@ -1,6 +1,7 @@
 package cn.mycommons.mymockserver.service;
 
 import cn.mycommons.mymockserver.MyMockServer;
+import cn.mycommons.mymockserver.app.Const;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequest;
@@ -14,34 +15,38 @@ import org.littleshoot.proxy.HttpFiltersSourceAdapter;
  * ProxyHttpFiltersSourceAdapter <br/>
  * Created by Leon on 2017-08-29.
  */
-public class ProxyHttpFiltersSourceAdapter extends HttpFiltersSourceAdapter {
+public class ProxyAdapter extends HttpFiltersSourceAdapter {
 
     private static final int M_10 = 10 * 1024 * 1024;
-    private static final Logger LOGGER = Logger.getLogger(ProxyHttpFiltersSourceAdapter.class);
+    private static final Logger LOGGER = Logger.getLogger(ProxyAdapter.class);
     private static final AttributeKey<String> CONNECTED_URL = AttributeKey.valueOf("connected_url");
 
     private MyMockServer myMockServer;
 
-    public ProxyHttpFiltersSourceAdapter(MyMockServer myMockServer) {
+    public ProxyAdapter(MyMockServer myMockServer) {
         this.myMockServer = myMockServer;
     }
 
     @Override
     public HttpFilters filterRequest(HttpRequest originalRequest, ChannelHandlerContext clientCtx) {
-        String uri = originalRequest.getUri();
-        LOGGER.info("uri = " + uri);
+        String uri = originalRequest.uri();
+        HttpMethod method = originalRequest.method();
 
-        if (originalRequest.getMethod() == HttpMethod.CONNECT) {
-            if (clientCtx != null) {
-                String prefix = "https://" + uri.replaceFirst(":443$", "");
-                clientCtx.channel().attr(CONNECTED_URL).set(prefix);
+        LOGGER.info(method.name() + ": " + uri);
+        if (Const.HTTPS) {
+            if (method == HttpMethod.CONNECT) {
+                if (clientCtx != null) {
+                    String prefix = "https://" + uri.replaceFirst(":443$", "");
+                    clientCtx.channel().attr(CONNECTED_URL).set(prefix);
+                }
+                return new HttpFiltersAdapter(originalRequest, clientCtx);
             }
-            return new HttpFiltersAdapter(originalRequest, clientCtx);
+            String connectedUrl = clientCtx.channel().attr(CONNECTED_URL).get();
+            if (connectedUrl != null) {
+                originalRequest.setUri(connectedUrl + uri);
+            }
         }
-        String connectedUrl = clientCtx.channel().attr(CONNECTED_URL).get();
-        if (connectedUrl != null) {
-            originalRequest.setUri(connectedUrl + uri);
-        }
+
         return new ProxyHttpFilters(originalRequest, clientCtx, myMockServer);
     }
 
