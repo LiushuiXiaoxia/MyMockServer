@@ -60,12 +60,19 @@ distributions {
     }
 }
 
-task mmsDeploy(group: 'deploy', dependsOn: build, type: Exec) {
-    workingDir 'build/distributions'
-    // commandLine "tar -cvf ../../deploy/${jar.archiveName}.tar *.tar".split(" ")
-    commandLine "cp mms-${version}.tar ../../deploy".split(" ")
-    standardOutput = new ByteArrayOutputStream()
-    ext.output = {
-        return standardOutput.toString()
+distZip.doLast {
+    new ByteArrayOutputStream().withStream { os ->
+        project.exec {
+            commandLine "shasum -a 256 $distZip.archivePath".split(" ")
+            standardOutput = os
+        }
+        ext.sha = os.toString()
+    }
+    print ext.sha
+}
+
+assemble.doLast {
+    project.exec {
+        commandLine "cp ${distZip.archivePath} deploy".split(" ")
     }
 }
