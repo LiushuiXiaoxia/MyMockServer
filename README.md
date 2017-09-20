@@ -306,7 +306,7 @@ $ curl http://www.baidu.com
 $ curl http://www.baidu.com --proxy localhost:9090 -v
 ```
 
-![](doc/1.png)
+![](https://raw.githubusercontent.com/LiushuiXiaoxia/MyMockServer/master/doc/1.png)
 
 很显然，两次请求返回的数据是不一样的，只不过第二次我们设置了代理，然后代理返回Mock的数据，同样，在移动端，可以设置的网络代理，然后就可以Mock App中的请求数据。
 
