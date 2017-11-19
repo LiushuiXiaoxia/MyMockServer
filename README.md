@@ -91,52 +91,47 @@ template.groovy
 
 ```groovy
 mock {
-//    enable true
+    // enable true
     desc "template"
     request {
-//        scheme "http"
+        // scheme "http"
         host "www.google.com"
-//        port 80
-//        path "/api/login/"
-        method "GET"
+        // port 80
+        // path "/api/login/"
+        // method "GET"
         params {
-//            param "param_key_1", "param_value_1"
-//            param "param_key_2", "param_value_2"
+            // param "param_key_1", "param_value_1"
+            // param "param_key_2", "param_value_2"
         }
         headers {
-            header "header_key_1", "header_value_1"
-            header "time", new Date().format("yyyy-MM-dd HH:mm:ss")
-        }
-        body {
-
         }
     }
     response {
-//        version 'HTTP/1.1'
-//        code 200
+        // version 'HTTP/1.1'
+        // code 200
         headers {
             header "header_key_1", "header_value_1"
             header "time", new Date().format("yyyy-MM-dd HH:mm:ss")
         }
         body {
-//            text "text"
-//            textFile "file.txt"
-//
-            json """{"key":"value"}"""
-//            jsonFile "file.txt"
-//
-//            xml "<xml/>"
-//            xmlFile "file.txt"
-//
-//            html "<html/>"
-//            htmlFile "file.txt"
-//
-//            file "file.txt"
+            // text "text"
+            // textFile "file.txt"
+
+            // json """{"key":"value"}"""
+            // jsonFile "file.txt"
+
+            // xml "<xml/>"
+            // xmlFile "file.txt"
+
+            // html "<html/>"
+            // htmlFile "file.txt"
+
+            file "file.txt"
         }
     }
-//    control {
-//        delay 3
-//    }
+    control {
+        delay 1
+    }
 }
 ```
 
@@ -162,13 +157,11 @@ mock {
 
 **method**: 请求方法，如果设置，则匹配方法，否则为null，则认为匹配全部方法
 
-**params**: 请求参数，如果设置，则匹配参数，否则为null，则认为匹配成功，暂时无用，保留
+**params**: 请求参数，如果设置，则匹配参数，匹配规则是包含匹配，否则为null，则认为匹配成功
 
-**headers**: 请求头部，如果设置，则匹配头部，否则为null，则认为匹配成功，暂时无用，保留
+**headers**: 请求头部，如果设置，则匹配头部，匹配规则是包含匹配，否则为null，则认为匹配成功
 
-**body**: 请求实体，如果设置，则匹配实体，否则为null，则认为匹配成功，暂时无用，保留
-
-简单来说，如果设置了，就严格匹配，不设置则认为匹配成功。
+简单来说，如果设置了，就严格匹配，不设置则认为匹配成功。params和header是部分匹配，就是包含匹配，如果请求中包含全部的设置项，则认为匹配成功。
 
 ### 响应信息
 
@@ -301,9 +294,15 @@ mock {
 然后我们用curl来验证下。
 
 ```bash
-$ curl http://www.baidu.com
+curl http://baidu.com -s
 
-$ curl http://www.baidu.com --proxy localhost:9090 -v
+<html>
+<meta http-equiv="refresh" content="0;url=http://www.baidu.com/">
+</html>
+
+curl http://baidu.com --proxy localhost:9090 -s
+
+{"key":"value"}%
 ```
 
 ![](https://raw.githubusercontent.com/LiushuiXiaoxia/MyMockServer/master/doc/1.png)

@@ -66,6 +66,8 @@ public class ProxyHttpFilters extends HttpFiltersAdapter {
                 .filter(new PathMockPredicate(uri))
                 // method
                 .filter(new MethodMockPredicate(originalRequest))
+                // param
+                .filter(new ParamMockPredicate(originalRequest))
                 // header
                 .filter(new HeaderMockPredicate(originalRequest))
                 .findFirst();

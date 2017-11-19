@@ -14,7 +14,7 @@ class Request implements IBean {
     private String path
     private Params params
     private Headers headers
-    private Body body
+    // private Body body
 
     List<String> getScheme() {
         return scheme
@@ -72,13 +72,13 @@ class Request implements IBean {
         this.headers = headers
     }
 
-    Body getBody() {
-        return body
-    }
-
-    void setBody(Body body) {
-        this.body = body
-    }
+//    Body getBody() {
+//        return body
+//    }
+//
+//    void setBody(Body body) {
+//        this.body = body
+//    }
 
     def scheme(String string) {
         if (string != null) {

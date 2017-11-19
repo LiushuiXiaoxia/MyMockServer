@@ -5,6 +5,8 @@ mock {
         headers {
             header "aaa", "bbb"
         }
+        params {
+        }
     }
     response {
         code 200
