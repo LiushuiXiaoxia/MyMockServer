@@ -1,9 +1,10 @@
 mock {
     desc "mock login"
     request {
+        url "httpbin.org"
         host "httpbin.org"
         headers {
-            header "aaa", "bbb"
+            // header "aaa", "bbb"
         }
         params {
         }

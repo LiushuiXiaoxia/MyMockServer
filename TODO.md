@@ -33,3 +33,15 @@ mms -port 8001 --config mock
 
 * test unit
 
+* url 模糊匹配
+
+* 真正的dsl
+
+* callback
+
+* response中包含request
+
+* 等到真正的response回来以后，可以进行修改。
+
+
+

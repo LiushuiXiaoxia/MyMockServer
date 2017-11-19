@@ -51,26 +51,36 @@ public class ProxyHttpFilters extends HttpFiltersAdapter {
 
     private HttpResponse doCheck(String method) {
         URI uri = URI.create(originalRequest.uri());
-        // scheme,port,host,path,query,header,body
+
+        // url & header
         Optional<Mock> first = myMockServer.getConfigMock()
                 .stream()
-                // enable
-                .filter(new EnableMockPredicate())
-                // scheme
-                .filter(new SchemeMockPredicate(uri))
-                // port
-                .filter(new PortMockPredicate(uri))
-                // host
-                .filter(new HostMockPredicate(uri))
-                // path
-                .filter(new PathMockPredicate(uri))
-                // method
-                .filter(new MethodMockPredicate(originalRequest))
-                // param
-                .filter(new ParamMockPredicate(originalRequest))
-                // header
+                .filter(new UrlMockPredicate(originalRequest))
                 .filter(new HeaderMockPredicate(originalRequest))
                 .findFirst();
+
+        if (first == null) {
+            // scheme,port,host,path,query,header
+            first = myMockServer.getConfigMock()
+                    .stream()
+                    // enable
+                    .filter(new EnableMockPredicate())
+                    // scheme
+                    .filter(new SchemeMockPredicate(uri))
+                    // port
+                    .filter(new PortMockPredicate(uri))
+                    // host
+                    .filter(new HostMockPredicate(uri))
+                    // path
+                    .filter(new PathMockPredicate(uri))
+                    // method
+                    .filter(new MethodMockPredicate(originalRequest))
+                    // param
+                    .filter(new ParamMockPredicate(originalRequest))
+                    // header
+                    .filter(new HeaderMockPredicate(originalRequest))
+                    .findFirst();
+        }
 
         if (first != null && first.isPresent()) {
             Mock mock = first.get();
@@ -81,4 +91,5 @@ public class ProxyHttpFilters extends HttpFiltersAdapter {
         }
         return null;
     }
+
 }

@@ -13,6 +13,7 @@ class Request implements IBean {
     private String method
     private String path
     private Params params
+    private String url
     private Headers headers
     // private Body body
 
@@ -62,6 +63,14 @@ class Request implements IBean {
 
     void setParams(Params params) {
         this.params = params
+    }
+
+    String getUrl() {
+        return url
+    }
+
+    void setUrl(String url) {
+        this.url = url
     }
 
     Headers getHeaders() {
