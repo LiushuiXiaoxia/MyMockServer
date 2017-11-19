@@ -79,9 +79,10 @@ public class CmdMain {
                 try {
                     intPort = Integer.parseInt(port);
                     runStartServer(intPort, path);
-                } catch (Exception e) {
+                } catch (NumberFormatException e) {
                     showHelp("port = " + port + " error", options);
                 }
+
             } else if (cmd.hasOption(OPTION_P)) {
                 String port = cmd.getOptionValue(OPTION_P);
                 int intPort;
@@ -93,7 +94,7 @@ public class CmdMain {
                     }
 
                     runStartServer(intPort, path);
-                } catch (Exception e) {
+                } catch (NumberFormatException e) {
                     showHelp("port = " + port + " error", options);
                 }
             } else {
@@ -127,7 +128,7 @@ public class CmdMain {
 
         String authorityPath = HttpsCheck.initHttpsFiles();
 
-        MyMockServer server = new MyMockServer();
+        MyMockServer server = MyMockServer.getInstance();
         server.start(configPath, port, authorityPath);
     }
 

@@ -26,17 +26,33 @@ public class MyMockServer {
 
     private static final Logger LOGGER = Logger.getLogger(MyMockServer.class);
 
+    private static final MyMockServer INSTANCE = new MyMockServer();
+
+    public static MyMockServer getInstance() {
+        return INSTANCE;
+    }
+
     private final List<Mock> configMock = new ArrayList<>();
 
-    private WatchFileService watchPath;
+    private String workspacePath;
+    private int serverPort;
+
+    private WatchFileService watchPathService;
     private MockServerScan mockServerScan;
     private HttpProxyServer httpProxyServer;
 
+    private MyMockServer() {
+    }
+
     void start(String path, int port, String authorityPath) {
-        watchPath = new WatchFileService(path);
+        this.workspacePath = path;
+        this.serverPort = port;
+        // this.authorityPath = authorityPath;
+
+        watchPathService = new WatchFileService(path);
         mockServerScan = new MockServerScan(path, 1);
 
-        watchPath.setOnPathChangeCallback(() -> mockServerScan.reload());
+        watchPathService.setOnPathChangeCallback(() -> mockServerScan.reload());
         mockServerScan.setOnMockFileChange(new MockServerScan.OnMockFileChange() {
 
             @Override
@@ -55,7 +71,7 @@ public class MyMockServer {
                     builder.append(str)
                             .append(r.getHost() == null ? "[host]" : r.getHost())
                             .append(r.getPort() == 80 || r.getPort() <= 0 ? "/" : String.format(":%d/", r.getPort()))
-                            .append(r.getPath() == null ? "[path]/" : r.getPath());
+                            .append(r.getPath() == null ? "[workspacePath]/" : r.getPath());
 
                     String format = "Parse %s : %s \t\t %s -> %s";
                     String method = r.getMethod() == null ? "X" : r.getMethod();
@@ -71,7 +87,7 @@ public class MyMockServer {
         });
 
         mockServerScan.start();
-        watchPath.startWatch();
+        watchPathService.startWatch();
 
         try {
             String organization = "LittleProxy-mitm";
@@ -107,6 +123,14 @@ public class MyMockServer {
 
     public void stop() {
         httpProxyServer.stop();
-        watchPath.stopWatch();
+        watchPathService.stopWatch();
+    }
+
+    public String getWorkspacePath() {
+        return workspacePath;
+    }
+
+    public int getServerPort() {
+        return serverPort;
     }
 }

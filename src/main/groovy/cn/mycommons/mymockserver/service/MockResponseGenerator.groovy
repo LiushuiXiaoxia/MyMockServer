@@ -9,12 +9,12 @@ import org.apache.log4j.Logger
 import java.util.function.Consumer
 
 /**
- * HttpResponseUtil <br/>
+ * MockResponseGenerator <br/>
  * Created by Leon on 2017-08-29.
  */
-class MockResponseUtil {
+class MockResponseGenerator {
 
-    private static final Logger LOGGER = Logger.getLogger(MockResponseUtil.class)
+    private static final Logger LOGGER = Logger.getLogger(MockResponseGenerator.class)
 
     static HttpResponse gen(Mock mock) {
         long begin = System.currentTimeMillis()
@@ -31,41 +31,50 @@ class MockResponseUtil {
             ok = HttpResponseStatus.valueOf(mockResp.code)
         }
 
+        String contentType = null
         while (true) {
             if (mockResp.body) {
                 if (mockResp.body.text) {
                     buffer = Unpooled.wrappedBuffer(mockResp.body.text.bytes)
+                    contentType = "text/plain"
                     break
                 }
                 if (mockResp.body.textFile) {
-                    buffer = Unpooled.wrappedBuffer(mockResp.body.textFile.text.bytes)
+                    contentType = "text/plain"
+                    buffer = Unpooled.wrappedBuffer(mockResp.body.textFile.bytes)
                     break
                 }
 
                 if (mockResp.body.json) {
+                    contentType = "application/json"
                     buffer = Unpooled.wrappedBuffer(mockResp.body.json.bytes)
                     break
                 }
                 if (mockResp.body.jsonFile) {
-                    buffer = Unpooled.wrappedBuffer(mockResp.body.jsonFile.text.bytes)
+                    contentType = "application/json"
+                    buffer = Unpooled.wrappedBuffer(mockResp.body.jsonFile.bytes)
                     break
                 }
 
                 if (mockResp.body.xml) {
+                    contentType = "text/xml"
                     buffer = Unpooled.wrappedBuffer(mockResp.body.xml.bytes)
                     break
                 }
                 if (mockResp.body.xmlFile) {
-                    buffer = Unpooled.wrappedBuffer(mockResp.body.xmlFile.text.bytes)
+                    contentType = "text/xml"
+                    buffer = Unpooled.wrappedBuffer(mockResp.body.xmlFile.bytes)
                     break
                 }
 
                 if (mockResp.body.html) {
+                    contentType = "text/html"
                     buffer = Unpooled.wrappedBuffer(mockResp.body.html.bytes)
                     break
                 }
                 if (mockResp.body.htmlFile) {
-                    buffer = Unpooled.wrappedBuffer(mockResp.body.htmlFile.text.bytes)
+                    contentType = "text/html"
+                    buffer = Unpooled.wrappedBuffer(mockResp.body.htmlFile.bytes)
                     break
                 }
 
@@ -74,7 +83,12 @@ class MockResponseUtil {
                     break
                 }
                 if (mockResp.body.bytesFile) {
-                    buffer = Unpooled.wrappedBuffer(mockResp.body.bytesFile.text.bytes)
+                    buffer = Unpooled.wrappedBuffer(mockResp.body.bytesFile.bytes)
+                    break
+                }
+
+                if (mockResp.body.file) {
+                    buffer = Unpooled.wrappedBuffer(mockResp.body.file.bytes)
                     break
                 }
             }
@@ -92,7 +106,13 @@ class MockResponseUtil {
             })
         }
         // "Content-type":"text/html;charset=UTF-8"
-        response.headers().add("Content-type", "text/plain;charset=UTF-8")
+        if (contentType != null && contentType.length() != 0) {
+            response.headers().add("Content-type", contentType + ";charset=UTF-8")
+        } else {
+            response.headers().add("Content-type", "text/plain;charset=UTF-8")
+        }
+
+        response.headers().add(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE)
 
         long end = System.currentTimeMillis()
 

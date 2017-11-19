@@ -43,6 +43,7 @@ public class ProxyHttpFilters extends HttpFiltersAdapter {
             }
         } catch (Exception e) {
             LOGGER.info(String.format("proxy -> %s:%s fail, e = %s", method, uri, e.getMessage()));
+            LOGGER.error(e.getMessage(), e);
         }
         LOGGER.info(String.format("proxy -> %s:%s skip", method, uri));
         return null;
@@ -65,13 +66,15 @@ public class ProxyHttpFilters extends HttpFiltersAdapter {
                 .filter(new PathMockPredicate(uri))
                 // method
                 .filter(new MethodMockPredicate(originalRequest))
+                // header
+                .filter(new HeaderMockPredicate(originalRequest))
                 .findFirst();
 
         if (first != null && first.isPresent()) {
             Mock mock = first.get();
             LOGGER.debug(String.format("proxy -> %s:%s mock = %s", method, uri, mock));
             if (mock.getResponse() != null) {
-                return MockResponseUtil.gen(mock);
+                return MockResponseGenerator.gen(mock);
             }
         }
         return null;
