@@ -36,7 +36,7 @@ public class ProxyHttpFilters extends HttpFiltersAdapter {
         LOGGER.info(String.format("proxy -> %s:%s begin", method, uri));
 
         try {
-            HttpResponse mock = doCheck(method.name());
+            HttpResponse mock = matchMock(method.name());
             if (mock != null) {
                 LOGGER.info(String.format("proxy -> %s:%s success", method, uri));
                 return mock;
@@ -49,7 +49,7 @@ public class ProxyHttpFilters extends HttpFiltersAdapter {
         return null;
     }
 
-    private HttpResponse doCheck(String method) {
+    private HttpResponse matchMock(String method) {
         URI uri = URI.create(originalRequest.uri());
 
         // url & header
@@ -84,12 +84,11 @@ public class ProxyHttpFilters extends HttpFiltersAdapter {
 
         if (first != null && first.isPresent()) {
             Mock mock = first.get();
-            LOGGER.debug(String.format("proxy -> %s:%s mock = %s", method, uri, mock));
+            LOGGER.info(String.format("proxy -> %s:%s mock = %s", method, uri, mock));
             if (mock.getResponse() != null) {
-                return MockResponseGenerator.gen(mock);
+                return new MockResponseGenerator(mock).generate();
             }
         }
         return null;
     }
-
 }

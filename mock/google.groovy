@@ -1,21 +1,18 @@
 mock {
     // enable true
-    desc "template"
+    desc "google mock"
     request {
-        url "https://www.google.com.hk/"
+        url "https://www.google.*"
     }
     response {
         // version 'HTTP/1.1'
         // code 200
         headers {
             header "header_key_1", "header_value_1"
-            header "time", new Date().format("yyyy-MM-dd HH:mm:ss")
+            header "header_key_time", new Date().format("yyyy-MM-dd HH:mm:ss SSS")
         }
         body {
             file "file.txt"
         }
-    }
-    control {
-        delay 1
     }
 }

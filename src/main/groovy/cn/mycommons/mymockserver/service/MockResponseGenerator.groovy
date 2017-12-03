@@ -1,6 +1,7 @@
 package cn.mycommons.mymockserver.service
 
 import cn.mycommons.mymockserver.bean.Mock
+import cn.mycommons.mymockserver.util.GroovyUtil
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import io.netty.handler.codec.http.*
@@ -16,8 +17,23 @@ class MockResponseGenerator {
 
     private static final Logger LOGGER = Logger.getLogger(MockResponseGenerator.class)
 
-    static HttpResponse gen(Mock mock) {
+    private Mock originalMock
+
+    MockResponseGenerator(Mock mock) {
+        this.originalMock = mock
+    }
+
+    HttpResponse generate() {
         long begin = System.currentTimeMillis()
+
+        def index = originalMock.index
+        Mock mock = originalMock
+
+        // 重新生成一次，做一次假的dsl
+        def list = GroovyUtil.evaluate(new File(originalMock.mockFile))
+        if (index >= 0 && index < list.size()) {
+            mock = list.get(index)
+        }
 
         def version = HttpVersion.HTTP_1_1
         def ok = HttpResponseStatus.OK

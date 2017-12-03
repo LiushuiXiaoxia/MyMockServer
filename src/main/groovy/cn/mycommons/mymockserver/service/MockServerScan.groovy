@@ -1,12 +1,8 @@
 package cn.mycommons.mymockserver.service
 
-import cn.mycommons.mymockserver.MmsMain
 import cn.mycommons.mymockserver.bean.Mock
 import cn.mycommons.mymockserver.exception.MockException
-import cn.mycommons.mymockserver.exception.MockParseException
-
-import java.util.function.Consumer
-
+import cn.mycommons.mymockserver.util.GroovyUtil
 
 /**
  * MockServerScan <br/>
@@ -57,38 +53,8 @@ class MockServerScan {
         File[] files = getAllMockFiles()
         Arrays.asList(files).sort().each {
             if (it.isFile()) {
-                try {
-                    def propertyName = "result"
-                    Binding binding = new Binding()
-                    binding.setProperty(propertyName, new ArrayList())
-                    GroovyShell shell = new GroovyShell(MmsMain.classLoader, binding)
-                    def script = """
-import cn.mycommons.mymockserver.bean.Mock
-
-def mock(Closure closure) {
-    def mock = new Mock()
-    closure.delegate = mock
-    closure()
-    result.add(mock)
-}
-
-${it.text}"""
-                    shell.evaluate(script)
-                    def value = binding.getProperty(propertyName)
-                    if (value instanceof List) {
-                        value.forEach(new Consumer<Mock>() {
-                            @Override
-                            void accept(Mock mock) {
-                                mock.mockFile = it.getAbsolutePath()
-                            }
-                        })
-                        list.addAll(value)
-                    }
-                } catch (MissingMethodException e) {
-                    throw new MockParseException("${e.getMethod()} can not execute")
-                } catch (Exception e2) {
-                    throw new MockParseException(e2)
-                }
+                def value = GroovyUtil.evaluate(it)
+                list.addAll(value)
             }
         }
 
@@ -98,13 +64,12 @@ ${it.text}"""
     }
 
     private File[] getAllMockFiles() {
-        return new File(mockPath).listFiles(
-                new FilenameFilter() {
-                    @Override
-                    boolean accept(File dir, String name) {
-                        return name.toLowerCase().endsWith(".groovy")
-                    }
-                })
+        return new File(mockPath).listFiles(new FilenameFilter() {
+            @Override
+            boolean accept(File dir, String name) {
+                return name.toLowerCase().endsWith(".groovy")
+            }
+        })
     }
 
     void stop() {
