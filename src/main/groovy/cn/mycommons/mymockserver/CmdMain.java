@@ -1,6 +1,7 @@
 package cn.mycommons.mymockserver;
 
 import cn.mycommons.mymockserver.app.Const;
+import cn.mycommons.mymockserver.exception.MockException;
 import cn.mycommons.mymockserver.util.HttpsCheck;
 import cn.mycommons.mymockserver.util.MsgUtil;
 import cn.mycommons.mymockserver.util.SampleUtil;
@@ -8,7 +9,6 @@ import com.google.common.base.Joiner;
 import org.apache.commons.cli.*;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,8 +18,6 @@ import java.util.List;
  * Created by Leon on 2017-08-30.
  */
 public class CmdMain {
-
-    private static final Logger LOGGER = Logger.getLogger(CmdMain.class);
 
     private static final String OPTION_H = "h";
     private static final String OPTION_HELP = "help";
@@ -36,6 +34,9 @@ public class CmdMain {
     private static final String OPTION_L = "l";
     private static final String OPTION_LEVEL = "level";
 
+    private static final String OPTION_S = "s";
+    private static final String OPTION_SSL = "ssl";
+
     private static final List<String> LOGS = Arrays.asList(
             "ALL", "DEBUG", "INFO", "WARN", "ERROR", "FATAL", "OFF", "TRACE"
     );
@@ -50,6 +51,7 @@ public class CmdMain {
         options.addOption(OPTION_C, OPTION_CONFIG, true, "mock server path, default is current directory");
         options.addOption(OPTION_H, OPTION_HELP, false, "output usage information");
         options.addOption(OPTION_L, OPTION_LEVEL, true, "log level " + Joiner.on(",").join(LOGS));
+        options.addOption(OPTION_S, OPTION_SSL, false, "whether to enable ssl");
 
         CommandLineParser parser = new PosixParser();
         CommandLine cmd;
@@ -60,49 +62,47 @@ public class CmdMain {
             // log
             configLog(cmd);
 
+            // ssl
+            boolean ssl = cmd.hasOption(OPTION_SSL);
+
+            // port
+            int intPort = parsePort(cmd);
+
+            // path
+            String path = parsePath(cmd);
+
             if (cmd.hasOption(OPTION_H)) {
                 runHelp(options);
             } else if (cmd.hasOption(OPTION_I)) {
-                String path = Const.DEFAULT_PATH;
-                if (cmd.hasOption(OPTION_C)) {
-                    path = cmd.getOptionValue(OPTION_C);
-                }
                 runInit(path);
-            } else if (cmd.hasOption(OPTION_C)) {
-                String path = cmd.getOptionValue(OPTION_C);
-
-                String port = Const.DEFAULT_STRING_PORT;
-                if (cmd.hasOption(OPTION_P)) {
-                    port = cmd.getOptionValue(OPTION_P);
-                }
-                int intPort;
-                try {
-                    intPort = Integer.parseInt(port);
-                    runStartServer(intPort, path);
-                } catch (NumberFormatException e) {
-                    showHelp("port = " + port + " error", options);
-                }
-
-            } else if (cmd.hasOption(OPTION_P)) {
-                String port = cmd.getOptionValue(OPTION_P);
-                int intPort;
-                try {
-                    intPort = Integer.parseInt(port);
-                    String path = Const.DEFAULT_PATH;
-                    if (cmd.hasOption(OPTION_C)) {
-                        path = cmd.getOptionValue(OPTION_C);
-                    }
-
-                    runStartServer(intPort, path);
-                } catch (NumberFormatException e) {
-                    showHelp("port = " + port + " error", options);
-                }
             } else {
-                runStartServer(Const.DEFAULT_PORT, Const.DEFAULT_PATH);
+                runStartServer(intPort, path, ssl);
             }
-        } catch (ParseException e) {
+        } catch (ParseException | MockException e) {
             showHelp(e.getMessage(), options);
         }
+    }
+
+    private String parsePath(CommandLine cmd) {
+        String path = Const.DEFAULT_PATH;
+        if (cmd.hasOption(OPTION_C)) {
+            path = cmd.getOptionValue(OPTION_C);
+        }
+        return path;
+    }
+
+    private int parsePort(CommandLine cmd) throws MockException {
+        int intPort;
+        String port = Const.DEFAULT_STRING_PORT;
+        try {
+            if (cmd.hasOption(OPTION_P)) {
+                port = cmd.getOptionValue(OPTION_P);
+            }
+            intPort = Integer.parseInt(port);
+        } catch (NumberFormatException e) {
+            throw new MockException("port = " + port + " error");
+        }
+        return intPort;
     }
 
     private void configLog(CommandLine cmd) {
@@ -123,13 +123,13 @@ public class CmdMain {
         new HelpFormatter().printHelp("mms [options]", options);
     }
 
-    private void runStartServer(int port, String configPath) {
+    private void runStartServer(int port, String configPath, boolean ssl) {
         MsgUtil.msg();
 
         String authorityPath = HttpsCheck.initHttpsFiles();
 
         MyMockServer server = MyMockServer.getInstance();
-        server.start(configPath, port, authorityPath);
+        server.start(configPath, port, authorityPath, ssl);
     }
 
     private void runHelp(Options options) {

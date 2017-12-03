@@ -3,7 +3,7 @@ package cn.mycommons.mymockserver.service
 import cn.mycommons.mymockserver.MmsMain
 import cn.mycommons.mymockserver.bean.Mock
 import cn.mycommons.mymockserver.exception.MockException
-import cn.mycommons.mymockserver.exception.MockParaeException
+import cn.mycommons.mymockserver.exception.MockParseException
 
 import java.util.function.Consumer
 
@@ -85,9 +85,9 @@ ${it.text}"""
                         list.addAll(value)
                     }
                 } catch (MissingMethodException e) {
-                    throw new MockParaeException("${e.getMethod()} can not execute")
+                    throw new MockParseException("${e.getMethod()} can not execute")
                 } catch (Exception e2) {
-                    throw new MockParaeException(e2)
+                    throw new MockParseException(e2)
                 }
             }
         }

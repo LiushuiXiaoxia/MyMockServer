@@ -8,7 +8,7 @@
 
 ~~* mock server~~
 
-* ssl
+~~* ssl~~
 
 ~~* cmd param config~~
 
@@ -33,7 +33,7 @@ mms -port 8001 --config mock
 
 * test unit
 
-* url 模糊匹配
+~~* url 模糊匹配~~
 
 * 真正的dsl
 

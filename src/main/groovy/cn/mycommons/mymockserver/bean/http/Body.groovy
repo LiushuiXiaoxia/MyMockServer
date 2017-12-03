@@ -2,7 +2,7 @@ package cn.mycommons.mymockserver.bean.http
 
 import cn.mycommons.mymockserver.MyMockServer
 import cn.mycommons.mymockserver.bean.base.IBean
-import cn.mycommons.mymockserver.exception.MockParaeException
+import cn.mycommons.mymockserver.exception.MockParseException
 
 /**
  * Body <br/>
@@ -81,7 +81,7 @@ class Body implements IBean {
             if (f.exists()) {
                 return f
             } else {
-                throw new MockParaeException("${f.getAbsolutePath()} is not exists")
+                throw new MockParseException("${f.getAbsolutePath()} is not exists")
             }
         }
     }

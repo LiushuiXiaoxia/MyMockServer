@@ -1,6 +1,5 @@
 package cn.mycommons.mymockserver;
 
-import cn.mycommons.mymockserver.app.Const;
 import cn.mycommons.mymockserver.bean.Mock;
 import cn.mycommons.mymockserver.bean.http.Request;
 import cn.mycommons.mymockserver.service.MockServerScan;
@@ -36,6 +35,7 @@ public class MyMockServer {
 
     private String workspacePath;
     private int serverPort;
+    private boolean ssl;
 
     private WatchFileService watchPathService;
     private MockServerScan mockServerScan;
@@ -44,9 +44,10 @@ public class MyMockServer {
     private MyMockServer() {
     }
 
-    void start(String path, int port, String authorityPath) {
+    void start(String path, int port, String authorityPath, boolean ssl) {
         this.workspacePath = path;
         this.serverPort = port;
+        this.ssl = ssl;
         // this.authorityPath = authorityPath;
 
         watchPathService = new WatchFileService(path);
@@ -68,10 +69,14 @@ public class MyMockServer {
                     String str = r.getScheme().isEmpty() ? "[scheme]://" :
                             String.format("[%s]://", Joiner.on("/").join(r.getScheme()));
 
-                    builder.append(str)
-                            .append(r.getHost() == null ? "[host]" : r.getHost())
-                            .append(r.getPort() == 80 || r.getPort() <= 0 ? "/" : String.format(":%d/", r.getPort()))
-                            .append(r.getPath() == null ? "[workspacePath]/" : r.getPath());
+                    if (r.getUrl() != null) {
+                        builder.append(r.getUrl());
+                    } else {
+                        builder.append(str)
+                                .append(r.getHost() == null ? "{host}" : r.getHost())
+                                .append(r.getPort() == 80 || r.getPort() <= 0 ? "/" : String.format(":%d/", r.getPort()))
+                                .append(r.getPath() == null ? "{path}" : r.getPath());
+                    }
 
                     String format = "Parse %s : %s \t\t %s -> %s";
                     String method = r.getMethod() == null ? "X" : r.getMethod();
@@ -107,7 +112,7 @@ public class MyMockServer {
                     .withAllowLocalOnly(false)
                     .withFiltersSource(new ProxyAdapter(this));
 
-            if (Const.HTTPS) {
+            if (ssl) {
                 bootstrap.withManInTheMiddle(new CertificateSniffingMitmManager(authority));
             }
 
@@ -132,5 +137,9 @@ public class MyMockServer {
 
     public int getServerPort() {
         return serverPort;
+    }
+
+    public boolean isSsl() {
+        return ssl;
     }
 }

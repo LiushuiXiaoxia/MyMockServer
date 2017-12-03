@@ -1,7 +1,7 @@
 package cn.mycommons.mymockserver.bean.http
 
 import cn.mycommons.mymockserver.bean.base.IBean
-import cn.mycommons.mymockserver.exception.MockParaeException
+import cn.mycommons.mymockserver.exception.MockParseException
 
 class Request implements IBean {
     static final String HTTP = "http"
@@ -101,7 +101,7 @@ class Request implements IBean {
                     if (HTTP == it || HTTPS == it) {
                         scheme.add(it)
                     } else {
-                        throw new MockParaeException("scheme($it) must be ${HTTP} 、 ${HTTPS}")
+                        throw new MockParseException("scheme($it) must be ${HTTP} 、 ${HTTPS}")
                     }
                 }
             }
