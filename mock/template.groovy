@@ -40,6 +40,4 @@ mock {
     control {
         delay 1
     }
-
-
 }
