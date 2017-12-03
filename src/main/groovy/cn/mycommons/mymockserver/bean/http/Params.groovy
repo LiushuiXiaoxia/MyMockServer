@@ -14,4 +14,8 @@ class Params implements IBean {
         param.put(key, value)
         return this
     }
+
+    Map<String, Object> getParam() {
+        return param
+    }
 }

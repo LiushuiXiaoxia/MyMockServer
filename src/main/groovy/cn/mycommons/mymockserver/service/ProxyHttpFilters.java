@@ -36,42 +36,57 @@ public class ProxyHttpFilters extends HttpFiltersAdapter {
         LOGGER.info(String.format("proxy -> %s:%s begin", method, uri));
 
         try {
-            HttpResponse mock = doCheck(method.name());
+            HttpResponse mock = matchMock(method.name());
             if (mock != null) {
                 LOGGER.info(String.format("proxy -> %s:%s success", method, uri));
                 return mock;
             }
         } catch (Exception e) {
             LOGGER.info(String.format("proxy -> %s:%s fail, e = %s", method, uri, e.getMessage()));
+            LOGGER.error(e.getMessage(), e);
         }
         LOGGER.info(String.format("proxy -> %s:%s skip", method, uri));
         return null;
     }
 
-    private HttpResponse doCheck(String method) {
+    private HttpResponse matchMock(String method) {
         URI uri = URI.create(originalRequest.uri());
-        // scheme,port,host,path,query,header,body
+
+        // url & header
         Optional<Mock> first = myMockServer.getConfigMock()
                 .stream()
-                // enable
-                .filter(new EnableMockPredicate())
-                // scheme
-                .filter(new SchemeMockPredicate(uri))
-                // port
-                .filter(new PortMockPredicate(uri))
-                // host
-                .filter(new HostMockPredicate(uri))
-                // path
-                .filter(new PathMockPredicate(uri))
-                // method
-                .filter(new MethodMockPredicate(originalRequest))
+                .filter(new UrlMockPredicate(originalRequest))
+                .filter(new HeaderMockPredicate(originalRequest))
                 .findFirst();
+
+        if (first == null) {
+            // scheme,port,host,path,query,header
+            first = myMockServer.getConfigMock()
+                    .stream()
+                    // enable
+                    .filter(new EnableMockPredicate())
+                    // scheme
+                    .filter(new SchemeMockPredicate(uri))
+                    // port
+                    .filter(new PortMockPredicate(uri))
+                    // host
+                    .filter(new HostMockPredicate(uri))
+                    // path
+                    .filter(new PathMockPredicate(uri))
+                    // method
+                    .filter(new MethodMockPredicate(originalRequest))
+                    // param
+                    .filter(new ParamMockPredicate(originalRequest))
+                    // header
+                    .filter(new HeaderMockPredicate(originalRequest))
+                    .findFirst();
+        }
 
         if (first != null && first.isPresent()) {
             Mock mock = first.get();
-            LOGGER.debug(String.format("proxy -> %s:%s mock = %s", method, uri, mock));
+            LOGGER.info(String.format("proxy -> %s:%s mock = %s", method, uri, mock));
             if (mock.getResponse() != null) {
-                return MockResponseUtil.gen(mock);
+                return new MockResponseGenerator(mock).generate();
             }
         }
         return null;

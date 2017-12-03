@@ -8,8 +8,10 @@ import org.apache.log4j.Logger;
 import org.littleshoot.proxy.HttpFilters;
 import org.littleshoot.proxy.HttpFiltersAdapter;
 import org.littleshoot.proxy.HttpFiltersSourceAdapter;
-import org.littleshoot.proxy.HttpProxyServer;
 import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
+
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 /**
  * LittleProxyTest <br/>
@@ -21,21 +23,21 @@ public class LittleProxySample {
     private static final Logger LOGGER = Logger.getLogger(LittleProxySample.class);
 
     public static void main(String[] args) {
-        HttpProxyServer server = DefaultHttpProxyServer.bootstrap()
+        DefaultHttpProxyServer.bootstrap()
                 .withPort(PORT)
                 .withFiltersSource(new HttpFiltersSourceAdapter() {
                     @Override
                     public HttpFilters filterRequest(HttpRequest originalRequest, ChannelHandlerContext ctx) {
-                        LOGGER.info("filterRequest originalRequest = " + originalRequest.getUri());
+                        LOGGER.info("filterRequest originalRequest = " + originalRequest.uri());
                         LOGGER.info("filterRequest ctx = " + ctx);
                         return new HttpFiltersAdapter(originalRequest, ctx) {
                             @Override
                             public HttpResponse clientToProxyRequest(HttpObject httpObject) {
                                 LOGGER.info("clientToProxyRequest");
                                 ByteBuf buffer = Unpooled.wrappedBuffer("Hello World!".getBytes());
-                                DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, buffer);
-                                HttpHeaders.setContentLength(response, buffer.readableBytes());
-                                HttpHeaders.setHeader(response, HttpHeaders.Names.CONTENT_TYPE, "text/html");
+                                DefaultFullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, OK, buffer);
+                                HttpUtil.setContentLength(response, buffer.readableBytes());
+                                response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/html");
                                 return response;
                             }
 

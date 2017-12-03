@@ -11,6 +11,9 @@ class Mock implements IBean {
 
     String mockFile
 
+    // mock config file index
+    int index
+
     String desc
 
     Request request
@@ -23,6 +26,6 @@ class Mock implements IBean {
 
     @Override
     String toString() {
-        new GsonBuilder().setPrettyPrinting().serializeNulls().create().toJson(this)
+        new GsonBuilder().setPrettyPrinting().create().toJson(this)
     }
 }

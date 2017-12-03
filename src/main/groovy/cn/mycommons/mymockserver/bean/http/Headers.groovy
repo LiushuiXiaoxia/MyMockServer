@@ -8,10 +8,18 @@ import cn.mycommons.mymockserver.bean.base.IBean
  */
 class Headers implements IBean {
 
-    Map<String, Object> header = new LinkedHashMap()
+    final Map<String, Object> header = new LinkedHashMap()
 
     def header(String key, Object value) {
         header.put(key, value)
         return this
+    }
+
+    def getHeaderValue(String key) {
+        return header.get(key)
+    }
+
+    Map<String, Object> getHeader() {
+        return header
     }
 }

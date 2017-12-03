@@ -1,6 +1,6 @@
 package cn.mycommons.mymockserver.util
 
-import cn.mycommons.mymockserver.exception.MockParaeException
+import cn.mycommons.mymockserver.exception.MockParseException
 import org.apache.log4j.Logger
 /**
  * DslUtil <br/>
@@ -27,7 +27,7 @@ class DslUtil {
                 obj.setProperty(name, arg)
             }
         } else {
-            throw new MockParaeException("${name} can not execute")
+            throw new MockParseException("${name} can not execute")
         }
     }
 
