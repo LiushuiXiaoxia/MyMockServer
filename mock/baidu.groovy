@@ -1,17 +1,19 @@
 mock {
     desc "baidu"
     request {
-        host "baidu.com"
+        url "baidu.com"
     }
     response {
         code 200
         headers {
             header "header_key_1", "header_value_1"
             header "header_key_2", "header_value_2"
-            header "time", new Date().format("yyyy-MM-dd HH:mm:ss")
+            header "header_time", new Date().format("yyyy-MM-dd HH:mm:ss")
         }
         body {
-            json """{"key":"value"}"""
+            json """
+{"key":"value"}
+"""
         }
     }
     control {

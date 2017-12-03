@@ -2,6 +2,22 @@
 
 ---
 
+<!-- TOC -->
+
+- [MyMockServer](#mymockserver)
+    - [简介](#简介)
+    - [安装](#安装)
+    - [使用](#使用)
+        - [描述](#描述)
+        - [请求匹配](#请求匹配)
+        - [响应信息](#响应信息)
+        - [控制信息](#控制信息)
+    - [示例](#示例)
+    - [修改记录](#修改记录)
+    - [其他](#其他)
+
+<!-- /TOC -->
+
 ## 简介
 
 在开发的时候，前端、移动端、后端开发分离，开发流程是先定义好接口API，然后按照接口约定进行开发。所以经常需要根据接口Mock数据，有从代码层进行Mock，也有从网络层进行代理的。
@@ -24,7 +40,7 @@
 
 * 动态监听配置文件，修改文件后，立马生效，不需要重启服务，节省时间
 
-# 安装
+## 安装
 
 使用Mac HomeBrew安装
 
@@ -43,7 +59,7 @@ brew install mms
 可以直接使用`mms`即可启动服务，`mms`支持参数如下。
 
 ```bash
-$ mms -h
+mms -h
 Path: /usr/local/bin/.
 Cmd: mms -h
 Log level : INFO
@@ -53,6 +69,7 @@ usage: mms [options]
  -i,--init           init some path as mock workspace
  -l,--level <arg>    log level ALL,DEBUG,INFO,WARN,ERROR,FATAL,OFF,TRACE
  -p,--port <arg>     mock server port, default is 9090
+ -s,--ssl            whether to enable ssl
 ```
 
 首先定义一个工作目录，默认情况下使用当前目录作为工作目录，工作目录用于保存配置文件。
@@ -91,52 +108,47 @@ template.groovy
 
 ```groovy
 mock {
-//    enable true
+    // enable true
     desc "template"
     request {
-//        scheme "http"
+        // scheme "http"
         host "www.google.com"
-//        port 80
-//        path "/api/login/"
-        method "GET"
+        // port 80
+        // path "/api/login/"
+        // method "GET"
         params {
-//            param "param_key_1", "param_value_1"
-//            param "param_key_2", "param_value_2"
+            // param "param_key_1", "param_value_1"
+            // param "param_key_2", "param_value_2"
         }
         headers {
-            header "header_key_1", "header_value_1"
-            header "time", new Date().format("yyyy-MM-dd HH:mm:ss")
-        }
-        body {
-
         }
     }
     response {
-//        version 'HTTP/1.1'
-//        code 200
+        // version 'HTTP/1.1'
+        // code 200
         headers {
             header "header_key_1", "header_value_1"
             header "time", new Date().format("yyyy-MM-dd HH:mm:ss")
         }
         body {
-//            text "text"
-//            textFile "file.txt"
-//
-            json """{"key":"value"}"""
-//            jsonFile "file.txt"
-//
-//            xml "<xml/>"
-//            xmlFile "file.txt"
-//
-//            html "<html/>"
-//            htmlFile "file.txt"
-//
-//            file "file.txt"
+            // text "text"
+            // textFile "file.txt"
+
+            // json """{"key":"value"}"""
+            // jsonFile "file.txt"
+
+            // xml "<xml/>"
+            // xmlFile "file.txt"
+
+            // html "<html/>"
+            // htmlFile "file.txt"
+
+            file "file.txt"
         }
     }
-//    control {
-//        delay 3
-//    }
+    control {
+        delay 1
+    }
 }
 ```
 
@@ -162,13 +174,15 @@ mock {
 
 **method**: 请求方法，如果设置，则匹配方法，否则为null，则认为匹配全部方法
 
-**params**: 请求参数，如果设置，则匹配参数，否则为null，则认为匹配成功，暂时无用，保留
+**params**: 请求参数，如果设置，则匹配参数，匹配规则是包含匹配，否则为null，则认为匹配成功
 
-**headers**: 请求头部，如果设置，则匹配头部，否则为null，则认为匹配成功，暂时无用，保留
+**url**: 使用整个Url做匹配，支持`*`做模糊匹配
 
-**body**: 请求实体，如果设置，则匹配实体，否则为null，则认为匹配成功，暂时无用，保留
+**headers**: 请求头部，如果设置，则匹配头部，匹配规则是包含匹配，否则为null，则认为匹配成功
 
-简单来说，如果设置了，就严格匹配，不设置则认为匹配成功。
+简单来说，如果设置了，就严格匹配，不设置则认为匹配成功。params和header是部分匹配，就是包含匹配，如果请求中包含全部的设置项，则认为匹配成功。
+
+匹配规则优先使用`Url + Headers`匹配，然后是`Scheme + Host + port + method + params + headers`匹配，第一个规则不满足再使用第二种，其实可以看出，第二个就是对第一种做详细的分解，这种两种可以满足不同的使用场景，常规使用，可以直接使用URL匹配，使用方便，还支持模糊匹配。
 
 ### 响应信息
 
@@ -204,8 +218,7 @@ mock {
 
 因为配置文件使用的是Groovy，所以可以使用三个双引号来设置字符串，比如设置返回为json字符，json是是包含双引号的，如果按照Java中方式，那么就会出现转码，这样不方便阅读和修改。
 
-那么可以这样设置，是不是很方便。
-
+那么可以这样设置，使用起来很方便。
 
 ```gradle
 json """
@@ -218,8 +231,7 @@ json """
 
 ### 控制信息
 
-**delay**: 设置响应时间，可以模拟入网环境，如果不设置，那么里面返回数据。
-
+**delay**: 设置响应时间，可以模拟入网环境，如果不设置，那么立即返回数据。
 
 ## 示例
 
@@ -267,20 +279,17 @@ Log level : INFO
 mock {
     desc "baidu"
     request {
-        host "www.baidu.com"
+        url "baidu.com"
     }
     response {
         code 200
         headers {
             header "header_key_1", "header_value_1"
             header "header_key_2", "header_value_2"
-            header "time", new Date().format("yyyy-MM-dd HH:mm:ss")
+            header "header_time", new Date().format("yyyy-MM-dd HH:mm:ss")
         }
         body {
-            json """{
-    "key":"value",
-    "hello":"world"
-}"""
+            json """ {"key":"value"} """
         }
     }
     control {
@@ -293,7 +302,7 @@ mock {
 
 ```bash
 [2017-09-20 19:40:25 | INFO] >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-[2017-09-20 19:40:25 | INFO] Parse X : [ [http/https]://baidu.com/[path]/ ] 		 /Users/xiaqiulei/test/proxy/./baidu.groovy -> baidu
+[2017-09-20 19:40:25 | INFO] Parse X : [ baidu.com ] 		 /Users/xiaqiulei/workspace/github/MyMockServer/mock/baidu.groovy -> baidu
 [2017-09-20 19:40:25 | INFO] Parse GET : [ [http/https]://www.google.com/[path]/ ] 		 /Users/xiaqiulei/test/proxy/./template.groovy -> template
 [2017-09-20 19:40:25 | INFO] <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 ```
@@ -301,17 +310,24 @@ mock {
 然后我们用curl来验证下。
 
 ```bash
-$ curl http://www.baidu.com
+curl http://baidu.com -s \
+--proxy http://127.0.0.1:9090 -k
 
-$ curl http://www.baidu.com --proxy localhost:9090 -v
+{"key":"value"}
 ```
 
 ![](https://raw.githubusercontent.com/LiushuiXiaoxia/MyMockServer/master/doc/1.png)
 
 很显然，两次请求返回的数据是不一样的，只不过第二次我们设置了代理，然后代理返回Mock的数据，同样，在移动端，可以设置的网络代理，然后就可以Mock App中的请求数据。
 
+## 修改记录
+
+* 支持https
+
+* 支持实时dsl
+
 ## 其他
 
-* 本代理服务器暂时支持http，不支持https，后续会支持https。
+* ~~本代理服务器暂时支持http，不支持https，后续会支持https。~~
 
-* 第一个版本较为粗糙，如有其它意见，欢迎交流。
+* 第一个版本较为粗糙，如有其它意见，欢迎交流，xiaqiulei@126.com 。

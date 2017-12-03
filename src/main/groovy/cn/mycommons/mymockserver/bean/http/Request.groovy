@@ -1,7 +1,7 @@
 package cn.mycommons.mymockserver.bean.http
 
 import cn.mycommons.mymockserver.bean.base.IBean
-import cn.mycommons.mymockserver.exception.MockParaeException
+import cn.mycommons.mymockserver.exception.MockParseException
 
 class Request implements IBean {
     static final String HTTP = "http"
@@ -13,8 +13,9 @@ class Request implements IBean {
     private String method
     private String path
     private Params params
+    private String url
     private Headers headers
-    private Body body
+    // private Body body
 
     List<String> getScheme() {
         return scheme
@@ -64,6 +65,14 @@ class Request implements IBean {
         this.params = params
     }
 
+    String getUrl() {
+        return url
+    }
+
+    void setUrl(String url) {
+        this.url = url
+    }
+
     Headers getHeaders() {
         return headers
     }
@@ -72,13 +81,13 @@ class Request implements IBean {
         this.headers = headers
     }
 
-    Body getBody() {
-        return body
-    }
-
-    void setBody(Body body) {
-        this.body = body
-    }
+//    Body getBody() {
+//        return body
+//    }
+//
+//    void setBody(Body body) {
+//        this.body = body
+//    }
 
     def scheme(String string) {
         if (string != null) {
@@ -92,7 +101,7 @@ class Request implements IBean {
                     if (HTTP == it || HTTPS == it) {
                         scheme.add(it)
                     } else {
-                        throw new MockParaeException("scheme($it) must be ${HTTP} 、 ${HTTPS}")
+                        throw new MockParseException("scheme($it) must be ${HTTP} 、 ${HTTPS}")
                     }
                 }
             }

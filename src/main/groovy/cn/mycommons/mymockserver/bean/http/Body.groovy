@@ -1,7 +1,8 @@
 package cn.mycommons.mymockserver.bean.http
 
+import cn.mycommons.mymockserver.MyMockServer
 import cn.mycommons.mymockserver.bean.base.IBean
-import cn.mycommons.mymockserver.exception.MockParaeException
+import cn.mycommons.mymockserver.exception.MockParseException
 
 /**
  * Body <br/>
@@ -31,8 +32,7 @@ class Body implements IBean {
     }
 
     void textFile(String file) {
-        checkFile(file)
-        this.textFile = new File(file)
+        this.textFile = checkFile(file)
     }
 
     void json(String json) {
@@ -40,8 +40,7 @@ class Body implements IBean {
     }
 
     void jsonFile(String file) {
-        checkFile(file)
-        this.jsonFile = new File(file)
+        this.jsonFile = checkFile(file)
     }
 
     void xml(String xml) {
@@ -49,8 +48,7 @@ class Body implements IBean {
     }
 
     void xmlFile(String file) {
-        checkFile(file)
-        this.xmlFile = new File(file)
+        this.xmlFile = checkFile(file)
     }
 
     void bytes(byte[] bytes) {
@@ -58,12 +56,11 @@ class Body implements IBean {
     }
 
     void bytesFile(String file) {
-        this.bytesFile = new File(file)
+        this.bytesFile = checkFile(file)
     }
 
     void file(String file) {
-        checkFile(file)
-        this.file = new File(file)
+        this.file = checkFile(file)
     }
 
     void html(String html) {
@@ -71,14 +68,21 @@ class Body implements IBean {
     }
 
     void htmlFile(String file) {
-        checkFile(file)
-        this.htmlFile = new File(file)
+        this.htmlFile = checkFile(file)
     }
 
-    private static void checkFile(String file) {
-        File f = new File(file)
-        if (!f.exists()) {
-            throw new MockParaeException("${f.getAbsolutePath()} is not exists")
+    private static File checkFile(String file) {
+        File f = new File(MyMockServer.instance.workspacePath, file)
+
+        if (f.exists()) {
+            return f
+        } else {
+            f = new File(file)
+            if (f.exists()) {
+                return f
+            } else {
+                throw new MockParseException("${f.getAbsolutePath()} is not exists")
+            }
         }
     }
 }

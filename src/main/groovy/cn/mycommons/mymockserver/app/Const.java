@@ -14,6 +14,4 @@ public class Const {
     public static final String DEFAULT_PATH = "./";
 
     public static final String DEFAULT_LOG_LEVEL = "INFO";
-
-    public static final boolean HTTPS = false;
 }

@@ -1,7 +1,6 @@
 package cn.mycommons.mymockserver.service;
 
 import cn.mycommons.mymockserver.MyMockServer;
-import cn.mycommons.mymockserver.app.Const;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequest;
@@ -33,7 +32,7 @@ public class ProxyAdapter extends HttpFiltersSourceAdapter {
         HttpMethod method = originalRequest.method();
 
         LOGGER.info(method.name() + ": " + uri);
-        if (Const.HTTPS) {
+        if (myMockServer.isSsl()) {
             if (method == HttpMethod.CONNECT) {
                 if (clientCtx != null) {
                     String prefix = "https://" + uri.replaceFirst(":443$", "");
